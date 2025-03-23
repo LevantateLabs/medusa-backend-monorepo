@@ -12,13 +12,14 @@ import (
 	"github.com/akhil-is-watching/medusa-backend-monorepo/pkg/nats"
 	"github.com/akhil-is-watching/medusa-backend-monorepo/pkg/repositories"
 	"github.com/akhil-is-watching/medusa-backend-monorepo/service/auth"
+	"github.com/joho/godotenv"
 )
 
 func main() {
-	// err := godotenv.Load()
-	// if err != nil {
-	// 	log.Fatalf("Failed to load .env file: %v", err)
-	// }
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatalf("Failed to load .env file: %v", err)
+	}
 
 	ctx := context.Background()
 	cfg := config.LoadConfig()

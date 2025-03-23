@@ -24,26 +24,26 @@ func NewPatientRepository(db *mongo.Client) PatientRepository {
 }
 
 func (r *patientRepository) CreatePatient(ctx context.Context, patient models.Patient) (models.Patient, error) {
-	collection := r.db.Database("medusa").Collection("patients")
+	collection := r.db.Database("test").Collection("patients")
 	_, err := collection.InsertOne(ctx, patient)
 	return patient, err
 }
 
 func (r *patientRepository) GetPatient(ctx context.Context, aadharNumber string) (models.Patient, error) {
-	collection := r.db.Database("medusa").Collection("patients")
+	collection := r.db.Database("test").Collection("patients")
 	var patient models.Patient
 	err := collection.FindOne(ctx, bson.M{"aadharNumber": aadharNumber}).Decode(&patient)
 	return patient, err
 }
 
 func (r *patientRepository) UpdatePatient(ctx context.Context, id string, patient models.Patient) (models.Patient, error) {
-	collection := r.db.Database("medusa").Collection("patients")
+	collection := r.db.Database("test").Collection("patients")
 	_, err := collection.UpdateOne(ctx, bson.M{"_id": id}, bson.M{"$set": patient})
 	return patient, err
 }
 
 func (r *patientRepository) DeletePatient(ctx context.Context, id string) error {
-	collection := r.db.Database("medusa").Collection("patients")
+	collection := r.db.Database("test").Collection("patients")
 	_, err := collection.DeleteOne(ctx, bson.M{"_id": id})
 	return err
 }

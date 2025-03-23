@@ -50,7 +50,7 @@ func Close(client *mongo.Client) error {
 
 // GetCollection returns a handle to the specified collection
 func GetCollection(client *mongo.Client, collectionName string) *mongo.Collection {
-	return client.Database("database").Collection(collectionName)
+	return client.Database("test").Collection(collectionName)
 }
 
 // GetClient returns the underlying MongoDB client
