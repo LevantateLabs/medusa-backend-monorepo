@@ -6,6 +6,7 @@ import (
 	"log"
 	"time"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -32,6 +33,17 @@ func NewMongoClient(uri string) (*mongo.Client, error) {
 
 	log.Println("Connected to MongoDB successfully")
 	// database := client.Database(dbName)
+
+	// Example of creating a unique index (place this in your DB initialization code)
+	indexModel := mongo.IndexModel{
+		Keys:    bson.D{{Key: "aadharNumber", Value: 1}},
+		Options: options.Index().SetUnique(true),
+	}
+	collection := client.Database("test").Collection("auth")
+	_, err = collection.Indexes().CreateOne(context.Background(), indexModel)
+	if err != nil {
+		log.Fatalf("Failed to create unique index on aadharNumber: %v", err)
+	}
 
 	return client, nil
 }

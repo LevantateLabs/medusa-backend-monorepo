@@ -9,7 +9,7 @@ import (
 // Patient represents a patient in the system
 type Auth struct {
 	ID           primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
-	AadharNumber string             `bson:"aadharNumber" json:"aadharNumber"`
+	AadharNumber string             `bson:"aadharNumber" json:"aadharNumber" validate:"required,unique"`
 	Name         string             `bson:"name" json:"name"`
 	Age          int                `bson:"age" json:"age"`
 	Sex          string             `bson:"sex" json:"sex"`
