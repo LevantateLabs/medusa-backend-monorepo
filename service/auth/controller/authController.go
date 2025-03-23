@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"errors"
 	"math/rand"
 	"strconv"
 
@@ -56,6 +57,7 @@ func (c *Controller) CreateUser(ctx *fiber.Ctx) error {
 func (c *Controller) Authenticate(ctx *fiber.Ctx) error {
 	var req types.AuthenticateRequest
 	if err := ctx.BodyParser(&req); err != nil {
+		c.logger.Error(err)
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Invalid request body",
 		})
@@ -63,12 +65,14 @@ func (c *Controller) Authenticate(ctx *fiber.Ctx) error {
 
 	auth, err := c.repo.GetAuthByAadharNumber(ctx.Context(), req.AadharNumber)
 	if err != nil {
+		c.logger.Error(err)
 		return response.Error(ctx, err)
 	}
 
 	otp := rand.Intn(1000000)
 	err = c.repo.SetOTP(ctx.Context(), req.AadharNumber, strconv.Itoa(otp))
 	if err != nil {
+		c.logger.Error(err)
 		return response.Error(ctx, err)
 	}
 
@@ -81,6 +85,7 @@ func (c *Controller) Authenticate(ctx *fiber.Ctx) error {
 func (c *Controller) VerifyOTP(ctx *fiber.Ctx) error {
 	var req types.VerifyOTPRequest
 	if err := ctx.BodyParser(&req); err != nil {
+		c.logger.Error(err)
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Invalid request body",
 		})
@@ -88,10 +93,12 @@ func (c *Controller) VerifyOTP(ctx *fiber.Ctx) error {
 
 	auth, err := c.repo.GetAuthByAadharNumber(ctx.Context(), req.AadharNumber)
 	if err != nil {
+		c.logger.Error(err)
 		return response.Error(ctx, err)
 	}
 
 	if auth.Otp != req.Otp {
+		c.logger.Error(errors.New("invalid OTP"))
 		return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 			"message": "Invalid OTP",
 		})
@@ -99,6 +106,7 @@ func (c *Controller) VerifyOTP(ctx *fiber.Ctx) error {
 
 	token, err := c.jwtManager.Generate(auth.AadharNumber, auth.Email, "PATIENT")
 	if err != nil {
+		c.logger.Error(err)
 		return response.Error(ctx, err)
 	}
 
