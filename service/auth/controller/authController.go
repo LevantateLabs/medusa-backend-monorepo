@@ -69,7 +69,8 @@ func (c *Controller) Authenticate(ctx *fiber.Ctx) error {
 		return response.Error(ctx, err)
 	}
 
-	otp := rand.Intn(1000000)
+	// Generate a 6-digit OTP between 100000 and 999999
+	otp := 100000 + rand.Intn(900000)
 	err = c.repo.SetOTP(ctx.Context(), req.AadharNumber, strconv.Itoa(otp))
 	if err != nil {
 		c.logger.Error(err)
