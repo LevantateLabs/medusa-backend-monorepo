@@ -1,0 +1,66 @@
+version: '3'
+
+services:
+  nats:
+    image: nats:latest
+    ports:
+      - "4222:4222"  # Client connections
+      - "8222:8222"  # HTTP monitoring port
+    volumes:
+      - nats_data:/data
+    restart: unless-stopped
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=example
+    restart: unless-stopped
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: service/auth/Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - nats
+      - mongodb
+    environment:
+      - MONGO_URL=mongodb://root:example@mongodb:27017
+      - NATS_URL=nats://nats:4222
+    restart: unless-stopped
+
+  patient-service:
+    build:
+      context: .
+      dockerfile: service/patient/Dockerfile
+    ports:
+      - "8081:8081"
+    depends_on:
+      - nats
+      - mongodb
+    environment:
+      - MONGO_URL=mongodb://root:example@mongodb:27017
+      - NATS_URL=nats://nats:4222
+    restart: unless-stopped
+
+  listener-service:
+    build:
+      context: .
+      dockerfile: service/listener/Dockerfile
+    depends_on:
+      - nats
+      - mongodb
+    environment:
+      - MONGO_URL=mongodb://root:example@mongodb:27017
+      - NATS_URL=nats://nats:4222
+    restart: unless-stopped
+
+volumes:
+  nats_data:
+  mongodb_data:
